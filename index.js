@@ -6,15 +6,16 @@ const LinearRegression = require('./linear-regression');
 let { features, labels, testFeatures, testLabels } = loadCSV('./cars.csv', {
   shuffle: true,
   splitTest: 50,
-  dataColumns: ['horsepower'],
+  dataColumns: ['horsepower', 'weight', 'displacement'],
   labelColumns: ['mpg']
 });
 
 const regression = new LinearRegression(features, labels, {
-  learningRate: 0.1,
+  learningRate: 1,
   iterations: 100
 });
 
 regression.train();
-r2 = regression.test(testFeatures, testLabels);
+const r2 = regression.test(testFeatures, testLabels);
+console.log("MSE History:", regression.mseHistory);
 console.log("R^2:", r2);
