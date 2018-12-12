@@ -11,11 +11,17 @@ let { features, labels, testFeatures, testLabels } = loadCSV('./cars.csv', {
 });
 
 const regression = new LinearRegression(features, labels, {
-  learningRate: 1,
-  iterations: 100
+  learningRate: 0.1,
+  iterations: 3,
+  batchSize: 10
 });
 
 regression.train();
 const r2 = regression.test(testFeatures, testLabels);
 console.log("MSE History:", regression.mseHistory);
 console.log("R^2:", r2);
+console.log("\n");
+
+regression.predict([
+  [120, 2, 380]
+]).print();

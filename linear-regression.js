@@ -14,9 +14,22 @@ class LinearRegression {
     }, options);
   }
 
+  predict(observations) {
+    return this.processFeatures(observations).matMul(this.weights);
+  }
+
   train() {
+    const batchQuantity = Math.floor(this.features.shape[0] / this.options.batchSize);
     for (let i = 0; i < this.options.iterations; i++) {
-      this.gradientDescent();
+      for (let j = 0; j < batchQuantity; j++) {
+        const { batchSize } = this.options;
+        const startIndex = j * batchSize;
+        const featureSlice = this.features.slice([startIndex, 0], [batchSize, -1]);
+        const labelSlice = this.labels.slice([startIndex, 0], [batchSize, -1]);
+
+        this.gradientDescent(featureSlice, labelSlice);
+      }
+
       this.recordMSE();
       this.updateLearningRate();
     }
@@ -75,14 +88,14 @@ class LinearRegression {
   //   this.b = this.b - bSlope * this.options.learningRate;
   // }
 
-  gradientDescent() {
-    const currentGuesses = this.features.matMul(this.weights);
-    const differences = currentGuesses.sub(this.labels);
+  gradientDescent(features, labels) {
+    const currentGuesses = features.matMul(this.weights);
+    const differences = currentGuesses.sub(labels);
 
-    const gradients = this.features
+    const gradients = features
       .transpose()
       .matMul(differences)
-      .div(this.features.shape[0]);
+      .div(features.shape[0]);
 
     this.weights = this.weights.sub(gradients.mul(this.options.learningRate));
   }
